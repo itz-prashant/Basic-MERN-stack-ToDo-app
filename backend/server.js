@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const routes = require('./routes/todo-routes');
 
 dotenv.config();
 
@@ -17,6 +18,8 @@ mongoose.connect(MONGO).then(()=>{
     console.log('MongoDb Connected');
     
 }).catch((error)=> console.log(error))
+
+app.use('/api', routes)
 
 app.listen(PORT, ()=>{
     console.log(`Server is Running on PORT : ${PORT}`);
