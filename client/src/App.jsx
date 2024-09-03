@@ -1,34 +1,51 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useEffect, useState } from 'react'
+import Todo from './components/Todo'
+import axios from 'axios';
+import { baseURL } from './utils/constant';
+import PopUp from './components/PopUp';
 
-function App() {
-  const [count, setCount] = useState(0)
+
+const App = () => {
+
+  const [toDos, settoDos] = useState([])
+  const [input, setInput] = useState("")
+  const [updateUi, setUpdateUi] = useState(false)
+  const [showPopup, setshowPopup] = useState(false)
+  const [setPopContent, setsetPopContent] = useState({})
+
+  useEffect(()=>{
+    axios.get(`${baseURL}/get`).then((res)=>{
+      settoDos(res.data)
+      
+    }).catch(err => console.log(err)
+    )
+  }, [updateUi])
+
+  const saveToDo = ()=>{
+    axios.post(`${baseURL}/save`, {toDo: input}).then((res)=>{
+      setUpdateUi((prev)=> !prev)
+      setInput("")
+    }).catch(err => console.log(err)
+    )
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <main>
+      <div className='container'>
+        <h1 className='title'>Todo App</h1>
+        <div className="input_holder">
+          <input 
+          value={input}
+          onChange={(e)=> setInput(e.target.value)}
+          type="text" placeholder='Add a ToDo' />
+          <button onClick={saveToDo}>Add</button>
+        </div>
+        <div className="list">
+          {toDos.map(el => <Todo key={el._id} setsetPopContent={setsetPopContent} setshowPopup={setshowPopup} setUpdateUi={setUpdateUi} text={el.toDo} id={el._id}/>)}
+        </div>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+      {showPopup && <PopUp setshowPopup={setshowPopup} setUpdateUi={setUpdateUi} setPopContent={setPopContent}/>}
+    </main>
   )
 }
 
